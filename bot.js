@@ -1,15 +1,6 @@
 /* Functions/Commands */
 function checkNewPost()
-{
-    //Repeat of Tumblr Auth, because I'm such a goddamn dumbass
-    var tumblr = require("tumblr.js");
-    var client = tumblr.createClient({
-        consumer_key: 'Rb9F1n3VlyENKV1tOfSPd7euGAkazokYElbj8Xv2xEv80DiyJH',
-        consumer_secret: 'XeMk4MI1kxRJjktELamRwfGY4UryARY9xy2d0LybWYwKNGqQwa',
-        token: 's7klWQOBsKAIdR75lJ2OseNtL4FpZrbvtnCcQwc0GoMSqxKkkN',
-        token_secret: 'Md6T7VxCtyZkaWWRY84k0n8y83IyfQB90gll44e9oIXVs9k9nM'
-    });
-    
+{   
     console.log("Checking for a new post...");
     console.log("Previous Post Timestamp: " + newPostTimestamp); //Debug feature.
     
@@ -28,8 +19,10 @@ function checkNewPost()
             {
                 newPostTimestamp = testTimestamp;
                 console.log("New post found!");
-                botClient.sendMessage("76431126977064960" , "Blog updated detected!\n"
-                                      + blog.posts[0].post_url);
+                botClient.sendMessage("76431126977064960" , "Blog update detected!\n"
+                                      + blog.posts[0].post_url + "\n"
+                                      + "**" + blog.posts[0].title + "**" + "\n" + "```"
+                                      + blog.posts[0].body) + "\n```";
                 replaceText(testTimestamp);
             }
             else
@@ -56,7 +49,12 @@ var Discord = require("discord.js");
 var botClient = new Discord.Client({autoReconnect: true});
 //Tumblr
 var tumblr = require("tumblr.js");
-var client = tumblr.createClient({ consumer_key: 'Rb9F1n3VlyENKV1tOfSPd7euGAkazokYElbj8Xv2xEv80DiyJH' });
+var client = tumblr.createClient({
+        consumer_key: 'Rb9F1n3VlyENKV1tOfSPd7euGAkazokYElbj8Xv2xEv80DiyJH',
+        consumer_secret: 'XeMk4MI1kxRJjktELamRwfGY4UryARY9xy2d0LybWYwKNGqQwa',
+        token: 's7klWQOBsKAIdR75lJ2OseNtL4FpZrbvtnCcQwc0GoMSqxKkkN',
+        token_secret: 'Md6T7VxCtyZkaWWRY84k0n8y83IyfQB90gll44e9oIXVs9k9nM'
+    });
 //File System (saving and grabbing previous content from last check)
 var fs = require("fs");
 var newPostTimestamp = retrieveText(); //gathered from Tumblr API Console, will change eventually. Upd8: It did, so...
@@ -86,6 +84,11 @@ botClient.on("message" , function(message){
     else if (message.content == "=forcecheck")
     {
         checkNewPost();
+    }
+    
+    else if (message.content.startsWith("=sessioninfo"))
+    {
+        botClient.reply(message, "There's no API to handle this yet!");
     }
 });
 
